@@ -533,7 +533,7 @@ exports.test_email_original_message_french_dash = function(test) {
 }
 
 exports.test_long_digit_string_no_backtracking = function(test) {
-	const longDigitString = "67".repeat(50000);
+	let longDigitString = '12345'.repeat(20000);
 
 	const startTime = Date.now();
 	const parser = new EmailReplyParser();
