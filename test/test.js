@@ -1,6 +1,8 @@
 var fs 			         = require("fs");
 var _  				       = require("underscore");
 var EmailReplyParser = require("../lib/emailreplyparser");
+var { buildDigestEmail } = require("./helpers/digestEmailBuilder");
+var { buildLongEmailThread } = require("./helpers/emailThreadBuilder");
 
 const COMMON_FIRST_FRAGMENT = 'Fusce bibendum, quam hendrerit sagittis tempor, dui turpis tempus erat, pharetra sodales ante sem sit amet metus.\n\
 Nulla malesuada, orci non vulputate lobortis, massa felis pharetra ex, convallis consectetur ex libero eget ante.\n\
@@ -542,6 +544,35 @@ exports.test_long_digit_string_no_backtracking = function(test) {
 
 	test.ok(elapsed < 1000, `Parsing took ${elapsed}ms, expected < 1000ms`);
 	test.equal(1, email.fragments.length);
+
+	test.done();
+}
+
+
+exports.test_long_thread = function(test) {
+	const longEmailThread = buildLongEmailThread({ depth: 1000 });
+
+	const startTime = Date.now();
+	const parser = new EmailReplyParser();
+	const email = parser.read(longEmailThread);
+	const elapsed = Date.now() - startTime;
+
+	test.ok(elapsed < 1000, `Parsing took ${elapsed}ms, expected < 1000ms`);
+	test.equal(1, email.fragments.length);
+
+	test.done();
+}
+
+exports.test_superlongmessage = function(test) {
+	const emailContent = buildDigestEmail();
+
+	const startTime = Date.now();
+	const parser = new EmailReplyParser();
+	const email = parser.read(emailContent);
+	const elapsed = Date.now() - startTime;
+
+	test.ok(elapsed < 1000, `Parsing took ${elapsed}ms, expected < 1000ms`);
+	test.ok(email.fragments.length >= 1, "Should have at least one fragment");
 
 	test.done();
 }
